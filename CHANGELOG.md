@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-06-21
+
 ### Added
 
 - Mermaid diagram rendering — fenced code blocks tagged `mermaid` are rendered as interactive diagrams via Mermaid.js; diagrams update on live reload and respect the active light/dark theme
@@ -35,5 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Single-file mode — `mdpreview README.md` previews a single file directly
 - Zero-config operation — `mdpreview` with no arguments previews the current directory
 
-[Unreleased]: https://github.com/RafaelAdao/markdown-preview-locally/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/RafaelAdao/markdown-preview-locally/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/RafaelAdao/markdown-preview-locally/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/RafaelAdao/markdown-preview-locally/releases/tag/v0.1.0
