@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Mermaid diagram rendering — fenced code blocks tagged `mermaid` are rendered as interactive diagrams via Mermaid.js; diagrams update on live reload and respect the active light/dark theme
 
+### Fixed
+
+- Relative links in rendered markdown (e.g. `[doc](docs/file.md)`) now open the target file inside the previewer instead of causing a full browser navigation
+- Navigating to a file inside a directory via an inline link now expands that directory in the sidebar
+
 ## [0.1.0] - 2026-06-21
 
 ### Added
