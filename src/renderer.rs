@@ -42,9 +42,66 @@ impl Theme {
     }
 }
 
+// ── Mermaid pre-processing ───────────────────────────────────────────────────
+
+/// Replace ```mermaid fences with <div class="mermaid"> before comrak sees them.
+/// comrak already has unsafe_ rendering enabled, so raw HTML blocks pass through.
+fn preprocess_mermaid(markdown: &str) -> String {
+    let mut out = String::with_capacity(markdown.len());
+    let mut in_mermaid = false;
+    let mut diagram = String::new();
+    let mut fence_ch = '`';
+    let mut fence_n = 0usize;
+
+    for line in markdown.lines() {
+        if !in_mermaid {
+            let trimmed = line.trim_start();
+            let mut found = false;
+            for &byte in &[b'`', b'~'] {
+                let n = trimmed.bytes().take_while(|&b| b == byte).count();
+                if n >= 3 && trimmed[n..].trim() == "mermaid" {
+                    fence_ch = byte as char;
+                    fence_n = n;
+                    in_mermaid = true;
+                    diagram.clear();
+                    found = true;
+                    break;
+                }
+            }
+            if !found {
+                out.push_str(line);
+                out.push('\n');
+            }
+        } else {
+            let trimmed = line.trim_start();
+            let n = trimmed.bytes().take_while(|&b| b == fence_ch as u8).count();
+            if n >= fence_n && trimmed[n..].trim().is_empty() {
+                out.push_str("<div class=\"mermaid\">");
+                out.push_str(&html_escape(diagram.trim_end()));
+                out.push_str("</div>\n\n");
+                in_mermaid = false;
+            } else {
+                diagram.push_str(line);
+                diagram.push('\n');
+            }
+        }
+    }
+
+    if in_mermaid {
+        // Unclosed fence: emit as-is so the user sees the raw text
+        let fence: String = std::iter::repeat(fence_ch).take(fence_n).collect();
+        out.push_str(&fence);
+        out.push_str("mermaid\n");
+        out.push_str(&diagram);
+    }
+
+    out
+}
+
 // ── GFM markdown rendering ───────────────────────────────────────────────────
 
 pub fn render_to_html(markdown: &str, theme: Theme) -> String {
+    let preprocessed = preprocess_mermaid(markdown);
     let adapter = SyntectAdapterBuilder::new()
         .theme(theme.syntect_name())
         .build();
@@ -68,7 +125,7 @@ pub fn render_to_html(markdown: &str, theme: Theme) -> String {
         ..Default::default()
     };
 
-    markdown_to_html_with_plugins(markdown, &options, &plugins)
+    markdown_to_html_with_plugins(&preprocessed, &options, &plugins)
 }
 
 // ── Generic file rendering ───────────────────────────────────────────────────
@@ -235,5 +292,28 @@ mod tests {
     fn url_encode_safe_chars() {
         assert_eq!(url_encode("docs/setup.md"), "docs/setup.md");
         assert_eq!(url_encode("path with spaces"), "path%20with%20spaces");
+    }
+
+    #[test]
+    fn mermaid_fence_replaced() {
+        let md = "```mermaid\ngraph TD\n  A --> B\n```\n";
+        let html = render_to_html(md, Theme::Light);
+        assert!(html.contains("<div class=\"mermaid\">"), "should emit mermaid div");
+        assert!(!html.contains("<pre"), "should not emit a code block");
+        assert!(html.contains("A --&gt; B") || html.contains("A --> B"));
+    }
+
+    #[test]
+    fn non_mermaid_fence_unaffected() {
+        let html = render_to_html("```rust\nfn f() {}\n```", Theme::Light);
+        assert!(!html.contains("class=\"mermaid\""));
+        assert!(html.contains("<span"));
+    }
+
+    #[test]
+    fn mermaid_tilde_fence() {
+        let md = "~~~mermaid\ngraph LR\n  X --> Y\n~~~\n";
+        let html = render_to_html(md, Theme::Light);
+        assert!(html.contains("<div class=\"mermaid\">"));
     }
 }

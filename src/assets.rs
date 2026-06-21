@@ -163,6 +163,10 @@ pre:hover .copy-btn,.copy-btn:focus{{opacity:1}}
 .copy-btn.copied{{color:#1a7f37;border-color:#1a7f37;opacity:1}}
 [data-theme="dark"] .copy-btn.copied{{color:#3fb950;border-color:#3fb950}}
 
+/* ── Mermaid diagrams ────────────────────────────────────────────────────────── */
+.mermaid{{text-align:center;overflow-x:auto;margin:16px 0}}
+.mermaid svg{{max-width:100%;height:auto}}
+
 /* ── Reconnect banner ────────────────────────────────────────────────────────── */
 #reconnect-banner{{
   display:none;position:fixed;top:0;left:0;right:0;
@@ -188,6 +192,7 @@ pre:hover .copy-btn,.copy-btn:focus{{opacity:1}}
 <main id="content">
   <article class="markdown-body">{content_html}</article>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
 <script>{APP_JS}</script>
 </body>
 </html>"#

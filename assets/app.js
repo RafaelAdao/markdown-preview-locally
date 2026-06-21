@@ -9,6 +9,7 @@
     var el = document.querySelector('.markdown-body');
     el.innerHTML = html;
     addCopyButtons(el);
+    renderMermaid(el);
   }
 
   // ── Copy buttons ─────────────────────────────────────────────────────────────
@@ -55,6 +56,29 @@
       btn.textContent = 'Copy';
       btn.classList.remove('copied');
     }, 2000);
+  }
+
+  // ── Mermaid diagrams ─────────────────────────────────────────────────────────
+  // mermaid.run() reads .innerHTML and sees HTML-escaped text (e.g. "--&gt;" instead
+  // of "-->"), which breaks parsing. We use mermaid.render(id, text) instead,
+  // passing node.textContent so the browser's HTML decoding happens first.
+
+  var mermaidSeq = 0;
+
+  function renderMermaid(container) {
+    if (!window.mermaid || !container) return;
+    mermaid.initialize({ startOnLoad: false, theme: currentTheme() === 'dark' ? 'dark' : 'default' });
+    var nodes = Array.from(container.querySelectorAll('.mermaid:not([data-processed="true"])'));
+    nodes.forEach(function (node) {
+      var source = node.textContent.trim();
+      node.setAttribute('data-processed', 'true');
+      mermaid.render('mmd-' + (++mermaidSeq), source)
+        .then(function (result) {
+          node.innerHTML = result.svg;
+          if (result.bindFunctions) result.bindFunctions(node);
+        })
+        .catch(function () {});
+    });
   }
 
   // ── Theme ────────────────────────────────────────────────────────────────────
@@ -142,8 +166,9 @@
   if (initTheme === 'dark' && currentPath) {
     fetchContent(currentPath, 'dark', setContent);
   } else {
-    // Still add copy buttons to the server-rendered content.
-    addCopyButtons(document.querySelector('.markdown-body'));
+    var body = document.querySelector('.markdown-body');
+    addCopyButtons(body);
+    renderMermaid(body);
   }
 
   connect();

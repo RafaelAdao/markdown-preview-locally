@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Mermaid diagram rendering — fenced code blocks tagged `mermaid` are rendered as interactive diagrams via Mermaid.js; diagrams update on live reload and respect the active light/dark theme
+
 ## [0.1.0] - 2026-06-21
 
 ### Added
