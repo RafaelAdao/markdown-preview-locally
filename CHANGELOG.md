@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Relative links in rendered markdown (e.g. `[doc](docs/file.md)`) now open the target file inside the previewer instead of causing a full browser navigation
 - Navigating to a file inside a directory via an inline link now expands that directory in the sidebar
+- Mermaid diagrams with blank lines (e.g. sequence diagrams) no longer break — switched container from `<div>` to `<pre>` so CommonMark does not end the HTML block at the first blank line
 
 ## [0.1.0] - 2026-06-21
 
