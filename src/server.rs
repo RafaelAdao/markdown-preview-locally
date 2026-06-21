@@ -30,6 +30,11 @@ pub struct PathQuery {
     theme: Option<String>,
 }
 
+#[derive(serde::Deserialize, Default)]
+struct IndexQuery {
+    path: Option<String>,
+}
+
 pub fn make_router(state: AppState) -> Router {
     Router::new()
         .route("/", get(index_handler))
@@ -42,20 +47,23 @@ pub fn make_router(state: AppState) -> Router {
 
 // ── Route handlers ───────────────────────────────────────────────────────────
 
-async fn index_handler(State(state): State<AppState>) -> Html<String> {
+async fn index_handler(
+    State(state): State<AppState>,
+    Query(params): Query<IndexQuery>,
+) -> Html<String> {
     let tree = crate::scanner::scan_tree(&state.root);
-    let default_path = crate::scanner::find_default(&tree);
 
-    let (content, current_rel) = match default_path {
-        Some(ref rel) => {
-            let abs = state.root.join(rel);
-            let html = crate::renderer::render_for_web(rel, &abs, crate::renderer::Theme::Light);
-            (html, rel.clone())
+    let (content, current_rel) = if let Some(ref path) = params.path {
+        // Honour ?path= so that F5 / deep-links restore the correct file.
+        match resolve_safe(&state.root, path) {
+            Some((abs, rel)) => {
+                let html = crate::renderer::render_for_web(&rel, &abs, crate::renderer::Theme::Light);
+                (html, rel)
+            }
+            None => default_content(&tree, &state.root),
         }
-        None => (
-            "<p style=\"color:#57606a\">No files found in this directory.</p>".to_string(),
-            String::new(),
-        ),
+    } else {
+        default_content(&tree, &state.root)
     };
 
     let sidebar = build_tree_html(&tree, &current_rel, 0);
@@ -158,8 +166,29 @@ fn resolve_safe(root: &Arc<PathBuf>, rel: &str) -> Option<(PathBuf, String)> {
     Some((canonical, clean_rel))
 }
 
+fn default_content(tree: &[TreeNode], root: &Arc<PathBuf>) -> (String, String) {
+    match crate::scanner::find_default(tree) {
+        Some(ref rel) => {
+            let abs = root.join(rel);
+            let html = crate::renderer::render_for_web(rel, &abs, crate::renderer::Theme::Light);
+            (html, rel.clone())
+        }
+        None => (
+            "<p style=\"color:#57606a\">No files found in this directory.</p>".to_string(),
+            String::new(),
+        ),
+    }
+}
+
 fn html_escape(s: &str) -> String {
     crate::renderer::html_escape(s)
+}
+
+fn dir_contains(d: &DirNode, current: &str) -> bool {
+    d.children.iter().any(|n| match n {
+        TreeNode::File(f) => f.rel_path == current,
+        TreeNode::Dir(sub) => dir_contains(sub, current),
+    })
 }
 
 /// Build `<li>` rows for the sidebar tree recursively.
@@ -172,9 +201,12 @@ fn build_tree_html(nodes: &[TreeNode], current: &str, _depth: usize) -> String {
 }
 
 fn build_dir_html(d: &DirNode, current: &str) -> String {
+    // Expand directories that contain the active file so F5 / deep-links don't
+    // leave the user with a collapsed sidebar hiding the current file.
+    let collapsed = if dir_contains(d, current) { "" } else { " collapsed" };
     let children_html = build_tree_html(&d.children, current, 0);
     format!(
-        "<li class=\"tree-dir collapsed\">\
+        "<li class=\"tree-dir{collapsed}\">\
           <div class=\"tree-dir-label\" onclick=\"toggleDir(this)\">\
             <span class=\"tree-arrow\">&#9660;</span>\
             {}\

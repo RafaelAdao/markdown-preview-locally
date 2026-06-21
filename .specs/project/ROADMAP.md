@@ -17,6 +17,8 @@
 - [x] Mermaid diagram rendering (client-side via Mermaid.js CDN)
 - [x] Relative link navigation — inline links open files inside the previewer
 - [x] Sidebar auto-expands to reveal the active file on navigation
+- [x] Language label on code blocks
+- [x] URL-based navigation — active file in URL, F5 restores file, back/forward works
 - [x] CHANGELOG
 
 **Definition of done:** `cargo install --path .` then `mdpreview ~/my-docs/` opens browser at `http://localhost:3000`, shows all `.md` files in sidebar, renders selected file with GitHub styling, auto-reloads on save, and renders Mermaid diagrams.
@@ -25,7 +27,7 @@
 
 ## v2 — Ideas (not committed)
 
-- **URL-based navigation** — reflect the active file in the browser URL (e.g. `?path=docs/api.md`) so that F5 / hard-refresh restores the file you were viewing instead of resetting to the default; requires `history.pushState` on navigate and reading the query param on page load
+- ~~**URL-based navigation**~~ ✅ — active file reflected in URL as `?path=…`; F5 / deep-links restore the file; back/forward buttons navigate file history; server reads `?path=` and auto-expands the correct sidebar directory
 - ~~**Language label on code blocks**~~ ✅ — `<span class="code-lang-label">` injected via `LanguageLabelAdapter` wrapper in `write_code_tag`; positioned top-left of the `<pre>` block
 - ~~**Richer code block showcase in test-docs**~~ ✅ — `test-docs/code-examples.md` covers Rust, C, Go, Python, JS, TS, Ruby, HTML, CSS, JSON, TOML, YAML, SQL, Bash, Dockerfile
 - Search across files

@@ -133,10 +133,15 @@
       .then(function (html) { if (html != null) cb(html); });
   }
 
-  function navigateTo(path) {
+  function navigateTo(path, push) {
     fetchContent(path, currentTheme(), function (html) {
       setContent(html);
       currentPath = path;
+
+      // Reflect the active file in the URL so F5 / hard-refresh restores it.
+      if (push !== false) {
+        history.pushState({ path: path }, '', '/?path=' + encodeURIComponent(path));
+      }
 
       var activeLink = null;
       document.querySelectorAll('#sidebar a[data-path]').forEach(function (a) {
@@ -160,6 +165,12 @@
       if (content) content.scrollTop = 0;
     });
   }
+
+  // Browser back / forward: restore the file that was recorded in the history entry.
+  window.addEventListener('popstate', function (e) {
+    var path = (e.state && e.state.path) || '';
+    if (path) navigateTo(path, false);
+  });
 
   window.loadFile = function (el) {
     navigateTo(el.getAttribute('data-path'));
@@ -214,6 +225,11 @@
 
   var initTheme = currentTheme();
   applyTheme(initTheme);
+
+  // Seed the initial history entry so the back button always has a state to pop to.
+  if (currentPath) {
+    history.replaceState({ path: currentPath }, '', '/?path=' + encodeURIComponent(currentPath));
+  }
 
   var markdownBody = document.querySelector('.markdown-body');
   handleContentLinks(markdownBody);

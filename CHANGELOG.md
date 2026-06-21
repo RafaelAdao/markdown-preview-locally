@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Mermaid diagram rendering — fenced code blocks tagged `mermaid` are rendered as interactive diagrams via Mermaid.js; diagrams update on live reload and respect the active light/dark theme
 - Language label on code blocks — the language name is displayed at the top-left of each fenced code block (e.g. `rust`, `bash`, `json`); blocks without a language tag show no label
+- URL-based navigation — the active file is reflected in the browser URL as `?path=docs/api.md`; pressing F5 or sharing the URL restores the exact file you were viewing; browser back/forward buttons navigate file history
 
 ### Fixed
 
