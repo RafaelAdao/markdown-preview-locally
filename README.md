@@ -2,7 +2,7 @@
 
 A local markdown previewer that renders files exactly like GitHub — served in your browser with live reload.
 
-See [CHANGELOG.md](CHANGELOG.md) for release history.
+See [CHANGELOG.md](CHANGELOG.md) for release history · [ROADMAP](.specs/project/ROADMAP.md) for what's planned.
 
 ## Features
 
