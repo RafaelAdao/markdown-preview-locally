@@ -27,11 +27,8 @@
 
 ## v2 — Ideas (not committed)
 
-- ~~**URL-based navigation**~~ ✅ — active file reflected in URL as `?path=…`; F5 / deep-links restore the file; back/forward buttons navigate file history; server reads `?path=` and auto-expands the correct sidebar directory
-- ~~**Language label on code blocks**~~ ✅ — `<span class="code-lang-label">` injected via `LanguageLabelAdapter` wrapper in `write_code_tag`; positioned top-left of the `<pre>` block
-- ~~**Richer code block showcase in test-docs**~~ ✅ — `test-docs/code-examples.md` covers Rust, C, Go, Python, JS, TS, Ruby, HTML, CSS, JSON, TOML, YAML, SQL, Bash, Dockerfile
+- Anchor link scrolling (`file.md#section`)
 - Search across files
 - Front matter display (YAML/TOML)
 - Custom port flag (`--port`)
 - Image serving from relative paths
-- Anchor link scrolling (`file.md#section`)
