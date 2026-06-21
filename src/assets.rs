@@ -148,6 +148,15 @@ body{{
 }}
 .binary-info a{{color:var(--color-link)}}
 
+/* ── Language label ──────────────────────────────────────────────────────────── */
+pre{{position:relative}}
+.code-lang-label{{
+  position:absolute;top:7px;left:12px;
+  font-size:10px;font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.08em;
+  user-select:none;pointer-events:none;
+}}
+
 /* ── Copy button ─────────────────────────────────────────────────────────────── */
 .copy-btn{{
   position:absolute;top:8px;right:8px;

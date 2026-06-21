@@ -6,6 +6,7 @@ A local markdown preview tool that renders files exactly like GitHub.
 
 - **[Setup Guide](docs/setup.md)** — installation and usage instructions
 - **[API Reference](docs/api.md)** — CLI options and live-reload protocol
+- **[Code Examples](code-examples.md)** — syntax highlighting showcase across many languages
 
 ## GFM Features
 

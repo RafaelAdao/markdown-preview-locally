@@ -1,5 +1,8 @@
+use comrak::adapters::SyntaxHighlighterAdapter;
 use comrak::plugins::syntect::SyntectAdapterBuilder;
 use comrak::{markdown_to_html_with_plugins, ExtensionOptions, Options, Plugins, RenderOptions};
+use std::collections::HashMap;
+use std::io::Write;
 use std::{path::Path, sync::OnceLock};
 use syntect::{
     easy::HighlightLines,
@@ -101,13 +104,43 @@ fn preprocess_mermaid(markdown: &str) -> String {
     out
 }
 
+// ── Language-label adapter ───────────────────────────────────────────────────
+
+/// Wraps the syntect adapter and injects a `<span class="code-lang-label">`
+/// between the `<pre>` and `<code>` tags so CSS can display the language name.
+struct LanguageLabelAdapter<'a> {
+    inner: &'a dyn SyntaxHighlighterAdapter,
+}
+
+impl SyntaxHighlighterAdapter for LanguageLabelAdapter<'_> {
+    fn write_pre_tag(&self, output: &mut dyn Write, attributes: HashMap<String, String>) -> std::io::Result<()> {
+        self.inner.write_pre_tag(output, attributes)
+    }
+
+    fn write_code_tag(&self, output: &mut dyn Write, attributes: HashMap<String, String>) -> std::io::Result<()> {
+        if let Some(class) = attributes.get("class") {
+            if let Some(lang) = class.strip_prefix("language-") {
+                if !lang.is_empty() {
+                    write!(output, "<span class=\"code-lang-label\">{}</span>", html_escape(lang))?;
+                }
+            }
+        }
+        self.inner.write_code_tag(output, attributes)
+    }
+
+    fn write_highlighted(&self, output: &mut dyn Write, lang: Option<&str>, code: &str) -> std::io::Result<()> {
+        self.inner.write_highlighted(output, lang, code)
+    }
+}
+
 // ── GFM markdown rendering ───────────────────────────────────────────────────
 
 pub fn render_to_html(markdown: &str, theme: Theme) -> String {
     let preprocessed = preprocess_mermaid(markdown);
-    let adapter = SyntectAdapterBuilder::new()
+    let syntect = SyntectAdapterBuilder::new()
         .theme(theme.syntect_name())
         .build();
+    let adapter = LanguageLabelAdapter { inner: &syntect };
 
     let mut plugins = Plugins::default();
     plugins.render.codefence_syntax_highlighter = Some(&adapter);
@@ -295,6 +328,19 @@ mod tests {
     fn url_encode_safe_chars() {
         assert_eq!(url_encode("docs/setup.md"), "docs/setup.md");
         assert_eq!(url_encode("path with spaces"), "path%20with%20spaces");
+    }
+
+    #[test]
+    fn code_block_shows_language_label() {
+        let html = render_to_html("```rust\nfn f() {}\n```", Theme::Light);
+        assert!(html.contains(r#"class="code-lang-label""#));
+        assert!(html.contains(">rust<"));
+    }
+
+    #[test]
+    fn code_block_without_language_has_no_label() {
+        let html = render_to_html("```\nsome code\n```", Theme::Light);
+        assert!(!html.contains("code-lang-label"));
     }
 
     #[test]
