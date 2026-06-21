@@ -1,0 +1,7 @@
+/target
+
+# IDE and AI tool configs
+.agents/
+.claude/
+.cursor/
+.windsurf/
