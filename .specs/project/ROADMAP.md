@@ -26,6 +26,8 @@
 ## v2 — Ideas (not committed)
 
 - **URL-based navigation** — reflect the active file in the browser URL (e.g. `?path=docs/api.md`) so that F5 / hard-refresh restores the file you were viewing instead of resetting to the default; requires `history.pushState` on navigate and reading the query param on page load
+- **Language label on code blocks** — display the language name as a badge on the top-right corner of fenced code blocks, matching GitHub's UI (e.g. `rust`, `bash`, `json`); requires passing the language string through the syntect adapter and injecting it into the rendered `<pre>` markup
+- **Richer code block showcase in test-docs** — expand `test-docs/` with fenced code examples covering more languages (Python, TypeScript, SQL, TOML, Dockerfile, etc.) to exercise the syntax highlighter and validate the language label feature
 - Search across files
 - Front matter display (YAML/TOML)
 - Custom port flag (`--port`)
