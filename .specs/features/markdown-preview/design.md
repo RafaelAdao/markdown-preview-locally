@@ -220,7 +220,7 @@ tower-http = { version = "0.3", features = ["fs"] }
 ## File Structure
 
 ```
-markdown-preview-localy/
+markdown-preview-locally/
 ├── Cargo.toml
 ├── assets/
 │   ├── github-markdown.css   # Embedded at compile time

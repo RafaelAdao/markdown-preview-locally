@@ -16,7 +16,7 @@
 
 **Steps:**
 1. `asdf install rust latest && asdf global rust latest` (need ≥ 1.70 for clap 4 + axum 0.6)
-2. `cargo init --name mdpreview` in `/home/RAFAEL.ADAO/src/markdown-preview-localy`
+2. `cargo init --name mdpreview` in `/home/RAFAEL.ADAO/src/markdown-preview-locally`
 3. Write `Cargo.toml` with all dependencies from design.md
 4. Create `src/` module stubs (empty `mod` declarations in `main.rs`)
 5. Create `assets/` directory with placeholder files
@@ -254,7 +254,7 @@
 
 **What:** Manual verification against a real markdown directory, then `cargo install`.
 
-**Where:** Test with `/home/RAFAEL.ADAO/src/markdown-preview-localy` itself (add test .md files)
+**Where:** Test with `/home/RAFAEL.ADAO/src/markdown-preview-locally` itself (add test .md files)
 
 **Depends on:** T08
 

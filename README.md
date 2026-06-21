@@ -2,6 +2,8 @@
 
 A local markdown previewer that renders files exactly like GitHub — served in your browser with live reload.
 
+See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 ## Features
 
 - **GitHub-flavored markdown** — tables, task lists, strikethrough, footnotes, autolinks
@@ -19,7 +21,7 @@ Requires [Rust](https://www.rust-lang.org/tools/install) (1.70+).
 
 ```sh
 git clone <this-repo>
-cd markdown-preview-localy
+cd markdown-preview-locally
 cargo install --path .
 ```
 

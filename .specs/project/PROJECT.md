@@ -1,4 +1,4 @@
-# markdown-preview-localy
+# markdown-preview-locally
 
 **Vision:** A fast, zero-config Rust CLI that serves any directory of markdown files as a local GitHub-style documentation site with live reload.
 **For:** Developers who write markdown and want to preview it exactly as it appears on GitHub — without pushing to a remote.
