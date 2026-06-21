@@ -166,6 +166,8 @@ pre:hover .copy-btn,.copy-btn:focus{{opacity:1}}
 /* ── Mermaid diagrams ────────────────────────────────────────────────────────── */
 .mermaid{{text-align:center;overflow-x:auto;margin:16px 0}}
 .mermaid svg{{max-width:100%;height:auto}}
+/* Reset <pre> defaults so the container doesn't look like a code block */
+pre.mermaid{{background:transparent!important;border:none!important;padding:0!important;font-family:inherit!important;white-space:normal!important;box-shadow:none!important}}
 
 /* ── Reconnect banner ────────────────────────────────────────────────────────── */
 #reconnect-banner{{

@@ -16,6 +16,7 @@
 
   function addCopyButtons(container) {
     container.querySelectorAll('pre').forEach(function (pre) {
+      if (pre.classList.contains('mermaid')) return;
       if (pre.querySelector('.copy-btn')) return;
       pre.style.position = 'relative';
 

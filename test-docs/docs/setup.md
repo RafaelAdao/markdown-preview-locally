@@ -1,5 +1,7 @@
 # Setup Guide
 
+← [Back to Home](../README.md) · [API Reference](api.md)
+
 ## Installation
 
 ```bash
@@ -28,3 +30,19 @@ mdpreview README.md
 
 - Rust 1.70+
 - Any modern browser
+
+## Architecture Overview
+
+```mermaid
+flowchart LR
+    CLI[CLI args] --> Main
+    Main --> Watcher
+    Main --> Server
+    Watcher -->|broadcast| Server
+    Server -->|WebSocket| Browser
+    Server -->|HTTP| Browser
+```
+
+---
+
+Next: [API Reference](api.md)

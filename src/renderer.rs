@@ -76,9 +76,12 @@ fn preprocess_mermaid(markdown: &str) -> String {
             let trimmed = line.trim_start();
             let n = trimmed.bytes().take_while(|&b| b == fence_ch as u8).count();
             if n >= fence_n && trimmed[n..].trim().is_empty() {
-                out.push_str("<div class=\"mermaid\">");
+                // Use <pre> not <div>: CommonMark ends a <div> HTML block at the
+                // first blank line inside the content, which breaks multi-paragraph
+                // diagrams. <pre> is a type-1 block that ends only at </pre>.
+                out.push_str("<pre class=\"mermaid\">");
                 out.push_str(&html_escape(diagram.trim_end()));
-                out.push_str("</div>\n\n");
+                out.push_str("</pre>\n\n");
                 in_mermaid = false;
             } else {
                 diagram.push_str(line);
@@ -295,11 +298,24 @@ mod tests {
     }
 
     #[test]
+    fn relative_link_keeps_relative_href() {
+        let html = render_to_html("[doc](docs/file.md)", Theme::Light);
+        assert!(html.contains(r#"href="docs/file.md""#), "relative link must stay relative");
+        assert!(!html.contains("http"), "relative link must not become absolute");
+    }
+
+    #[test]
+    fn external_link_keeps_absolute_href() {
+        let html = render_to_html("[GitHub](https://github.com)", Theme::Light);
+        assert!(html.contains(r#"href="https://github.com""#));
+    }
+
+    #[test]
     fn mermaid_fence_replaced() {
         let md = "```mermaid\ngraph TD\n  A --> B\n```\n";
         let html = render_to_html(md, Theme::Light);
-        assert!(html.contains("<div class=\"mermaid\">"), "should emit mermaid div");
-        assert!(!html.contains("<pre"), "should not emit a code block");
+        assert!(html.contains("<pre class=\"mermaid\">"), "should emit mermaid pre");
+        assert!(!html.contains("<code"), "should not emit a code block");
         assert!(html.contains("A --&gt; B") || html.contains("A --> B"));
     }
 
@@ -314,6 +330,6 @@ mod tests {
     fn mermaid_tilde_fence() {
         let md = "~~~mermaid\ngraph LR\n  X --> Y\n~~~\n";
         let html = render_to_html(md, Theme::Light);
-        assert!(html.contains("<div class=\"mermaid\">"));
+        assert!(html.contains("<pre class=\"mermaid\">"));
     }
 }
