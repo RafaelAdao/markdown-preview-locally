@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Relative images in markdown (e.g. `![demo](assets/demo.gif)`) are now served and rendered correctly inside the previewer
+
 ## [1.0.0] - 2026-06-21
 
 ### Added
