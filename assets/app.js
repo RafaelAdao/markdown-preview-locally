@@ -133,22 +133,75 @@
       .then(function (html) { if (html != null) cb(html); });
   }
 
-  window.loadFile = function (el) {
-    var path = el.getAttribute('data-path');
+  function navigateTo(path) {
     fetchContent(path, currentTheme(), function (html) {
       setContent(html);
       currentPath = path;
 
+      var activeLink = null;
       document.querySelectorAll('#sidebar a[data-path]').forEach(function (a) {
-        a.classList.toggle('active', a.getAttribute('data-path') === path);
+        var isActive = a.getAttribute('data-path') === path;
+        a.classList.toggle('active', isActive);
+        if (isActive) activeLink = a;
       });
+
+      // Expand every collapsed ancestor directory of the active file.
+      if (activeLink) {
+        var el = activeLink.parentElement;
+        while (el && el.id !== 'sidebar') {
+          if (el.classList.contains('tree-dir')) el.classList.remove('collapsed');
+          el = el.parentElement;
+        }
+      }
 
       document.title = path.split('/').pop() + ' — mdpreview';
 
       var content = document.getElementById('content');
       if (content) content.scrollTop = 0;
     });
+  }
+
+  window.loadFile = function (el) {
+    navigateTo(el.getAttribute('data-path'));
   };
+
+  // ── Relative-path resolution ──────────────────────────────────────────────────
+
+  function resolveRelativePath(base, rel) {
+    var dir = base.replace(/[^/]*$/, '');
+    var parts = (dir + rel).split('/');
+    var out = [];
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      if (p === '..') out.pop();
+      else if (p !== '' && p !== '.') out.push(p);
+    }
+    return out.join('/');
+  }
+
+  // ── In-content link interception ──────────────────────────────────────────────
+  // Intercepts clicks on relative links inside rendered markdown so they open
+  // inside the previewer instead of causing a full browser navigation.
+
+  function handleContentLinks(container) {
+    container.addEventListener('click', function (e) {
+      var a = e.target.closest('a');
+      if (!a) return;
+      var href = a.getAttribute('href');
+      if (!href) return;
+      // Let fragment-only and external links pass through normally.
+      if (href.startsWith('#') || /^(https?:\/\/|mailto:|\/\/)/.test(href)) return;
+      e.preventDefault();
+      // Strip any trailing fragment (#section) — we load the file, ignore anchor.
+      var hashIdx = href.indexOf('#');
+      var filePart = hashIdx !== -1 ? href.slice(0, hashIdx) : href;
+      if (!filePart) return;
+      var path = filePart.startsWith('/')
+        ? filePart.slice(1)
+        : resolveRelativePath(currentPath, filePart);
+      navigateTo(path);
+    });
+  }
 
   // ── Directory toggle ─────────────────────────────────────────────────────────
 
@@ -162,13 +215,15 @@
   var initTheme = currentTheme();
   applyTheme(initTheme);
 
+  var markdownBody = document.querySelector('.markdown-body');
+  handleContentLinks(markdownBody);
+
   // Server always renders initial content in light mode; re-fetch if dark saved.
   if (initTheme === 'dark' && currentPath) {
     fetchContent(currentPath, 'dark', setContent);
   } else {
-    var body = document.querySelector('.markdown-body');
-    addCopyButtons(body);
-    renderMermaid(body);
+    addCopyButtons(markdownBody);
+    renderMermaid(markdownBody);
   }
 
   connect();
