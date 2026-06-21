@@ -25,6 +25,7 @@
 
 ## v2 — Ideas (not committed)
 
+- **URL-based navigation** — reflect the active file in the browser URL (e.g. `?path=docs/api.md`) so that F5 / hard-refresh restores the file you were viewing instead of resetting to the default; requires `history.pushState` on navigate and reading the query param on page load
 - Search across files
 - Front matter display (YAML/TOML)
 - Custom port flag (`--port`)
