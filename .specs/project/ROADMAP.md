@@ -6,7 +6,7 @@
 
 **Features:**
 - [x] Project initialized
-- [x] MDPV: Markdown Preview feature (single deliverable — see spec)
+- [x] MDPV: Markdown Preview feature
   - [x] CLI entry point (`clap`)
   - [x] Directory scanner (`walkdir`)
   - [x] GFM markdown renderer (`comrak` + `syntect`)
@@ -14,8 +14,12 @@
   - [x] File watcher (`notify`)
   - [x] WebSocket live reload
   - [x] Browser auto-open (`webbrowser`)
+- [x] Mermaid diagram rendering (client-side via Mermaid.js CDN)
+- [x] Relative link navigation — inline links open files inside the previewer
+- [x] Sidebar auto-expands to reveal the active file on navigation
+- [x] CHANGELOG
 
-**Definition of done:** `cargo install --path .` then `mdpreview ~/my-docs/` opens browser at `http://localhost:3000`, shows all `.md` files in sidebar, renders selected file with GitHub styling, and auto-reloads on save.
+**Definition of done:** `cargo install --path .` then `mdpreview ~/my-docs/` opens browser at `http://localhost:3000`, shows all `.md` files in sidebar, renders selected file with GitHub styling, auto-reloads on save, and renders Mermaid diagrams.
 
 ---
 
@@ -24,5 +28,5 @@
 - Search across files
 - Front matter display (YAML/TOML)
 - Custom port flag (`--port`)
-- Mermaid diagram rendering
 - Image serving from relative paths
+- Anchor link scrolling (`file.md#section`)
