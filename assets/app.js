@@ -10,6 +10,7 @@
     el.innerHTML = html;
     addCopyButtons(el);
     renderMermaid(el);
+    rewriteImagePaths(el);
   }
 
   // ── Copy buttons ─────────────────────────────────────────────────────────────
@@ -190,6 +191,19 @@
     return out.join('/');
   }
 
+  // ── Image path rewriting ──────────────────────────────────────────────────────
+  // comrak outputs <img src="relative/path"> which the browser can't resolve.
+  // Rewrite relative src values to go through /file?path=… like other assets.
+
+  function rewriteImagePaths(container) {
+    container.querySelectorAll('img[src]').forEach(function (img) {
+      var src = img.getAttribute('src');
+      if (!src || /^(https?:\/\/|\/|data:)/.test(src)) return;
+      var resolved = resolveRelativePath(currentPath, src);
+      img.setAttribute('src', '/file?path=' + encodeURIComponent(resolved));
+    });
+  }
+
   // ── In-content link interception ──────────────────────────────────────────────
   // Intercepts clicks on relative links inside rendered markdown so they open
   // inside the previewer instead of causing a full browser navigation.
@@ -240,6 +254,7 @@
   } else {
     addCopyButtons(markdownBody);
     renderMermaid(markdownBody);
+    rewriteImagePaths(markdownBody);
   }
 
   connect();
